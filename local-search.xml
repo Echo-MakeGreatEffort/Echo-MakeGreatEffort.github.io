@@ -4,49 +4,23 @@
   
   
   <entry>
-    <title>测试图片上传</title>
-    <link href="/2022/07/11/%E6%B5%8B%E8%AF%95%E5%9B%BE%E7%89%87%E4%B8%8A%E4%BC%A0/"/>
-    <url>/2022/07/11/%E6%B5%8B%E8%AF%95%E5%9B%BE%E7%89%87%E4%B8%8A%E4%BC%A0/</url>
+    <title>FormData实现本地文件上传</title>
+    <link href="/2022/07/18/FormData%E5%AE%9E%E7%8E%B0%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/"/>
+    <url>/2022/07/18/FormData%E5%AE%9E%E7%8E%B0%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0/</url>
     
-    <content type="html"><![CDATA[<p><img src="/2022/07/11/%E6%B5%8B%E8%AF%95%E5%9B%BE%E7%89%87%E4%B8%8A%E4%BC%A0/image-20220711102453498.png" alt="image-20220711102453498"></p><p>哈哈哈哈哈哈哈<img src="/2022/07/11/%E6%B5%8B%E8%AF%95%E5%9B%BE%E7%89%87%E4%B8%8A%E4%BC%A0/image-20220711103634457.png" alt="image-20220711103634457"></p>]]></content>
-    
-    
-    
-  </entry>
-  
-  
-  
-  <entry>
-    <title>今日草稿</title>
-    <link href="/2022/07/06/%E4%BB%8A%E6%97%A5%E8%8D%89%E7%A8%BF/"/>
-    <url>/2022/07/06/%E4%BB%8A%E6%97%A5%E8%8D%89%E7%A8%BF/</url>
-    
-    <content type="html"><![CDATA[]]></content>
-    
-    
-    
-  </entry>
-  
-  
-  
-  <entry>
-    <title>Vue2</title>
-    <link href="/2022/07/06/Vue2/"/>
-    <url>/2022/07/06/Vue2/</url>
-    
-    <content type="html"><![CDATA[<p>今天读了什么呢？</p>]]></content>
+    <content type="html"><![CDATA[<h4 id="1-问题"><a href="#1-问题" class="headerlink" title="(1) 问题"></a>(1) 问题</h4><p>​<code>js</code>如何实现简单的本地文件上传？</p><h4 id="2-FormData概念补充"><a href="#2-FormData概念补充" class="headerlink" title="(2) FormData概念补充"></a>(2) <code>FormData</code>概念补充</h4><ol><li><code>FormData</code>提供了一种表示表单数据的键值对<code>key/value</code>的构造方式，并且可以轻松的通过<code>XMLHttpRequest.send()</code>的方式发送出去</li><li>实现了<code>FormData</code>接口的对象可以直接在<code>for...of</code>结构中使用，而不需要调用<code>entries()</code></li><li><strong>此特性可用于<code>Web Workers</code></strong></li><li><code>FormData</code>对象的方法，参考<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/FormData">FormData</a></li><li><code>FormData()</code>构造函数用于创建一个新的<code>FormData</code>对象<ul><li>可选参数<code>form</code>: <code>var formData = new FormData(form)</code>，当指定<code>form</code>参数时，创建的<code>FormData</code>对象会自动将<code>form</code>中的表单值也包含进去，包括文件内容也会被编码之后包含进去</li></ul></li></ol><h4 id="3-Web-Workers概念补充"><a href="#3-Web-Workers概念补充" class="headerlink" title="(3) Web Workers概念补充"></a>(3) <code>Web Workers</code>概念补充</h4><ol><li><code>Web Workers</code>可以实现在独立于<code>Web</code>应用程序主执行线程的后台线程中运行脚本，从而可以将一些任务交给非主线程的其他独立线程去做，而不会阻塞&#x2F;减慢主线程(通常是<code>UI</code>)运行</li><li><code>worker</code>是使用构造函数(例如<code>Worker()</code>)创建的对象，在该对象中会运行一个命名的<code>javascript</code>文件</li><li>工作线程和主线程之间的数据发送通过消息系统来实现：双方都使用<code>postMessage()</code>方法发送消息；通过<code>onmessage</code>事件处理程序来响应消息(消息包含在<code>Message</code>事件的<code>data</code>属性中)。<strong>数据是复制的而不是共享的</strong></li></ol><h4 id="4-解决方案"><a href="#4-解决方案" class="headerlink" title="(4) 解决方案"></a>(4) 解决方案</h4><ol><li><p><code>input</code>框的<code>type = file</code>时，即可选择本地文件</p></li><li><p><code>FormData</code>对象的使用：</p><ul><li><p>将<code>form</code>中所有表单元素的<code>name</code>和<code>value</code>组装成一个<code>queryString</code>(查询字符串？)。<code>FormData</code>对象的操作方法，全部在原型中，自己本身没有任何的属性及方法。</p><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs csharp"><span class="hljs-keyword">let</span> formData = <span class="hljs-keyword">new</span> FormData()<br>formData.append(<span class="hljs-string">&#x27;user&#x27;</span>, <span class="hljs-string">&#x27;zhang&#x27;</span>)<br>formData.<span class="hljs-keyword">get</span>(<span class="hljs-string">&#x27;user&#x27;</span>)  <span class="hljs-comment">// zhang</span><br></code></pre></td></tr></table></figure></li><li><p>异步上传二进制数据</p><figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs stata">&lt;<span class="hljs-keyword">form</span> action=<span class="hljs-string">&quot;&quot;</span>&gt;<br>    &lt;<span class="hljs-keyword">label</span> <span class="hljs-keyword">for</span>=<span class="hljs-string">&quot;&quot;</span>&gt;<br>        文件：&lt;<span class="hljs-keyword">input</span> id=<span class="hljs-string">&quot;file&quot;</span> <span class="hljs-keyword">type</span>=<span class="hljs-string">&quot;file&quot;</span> name=<span class="hljs-string">&quot;file&quot;</span>&gt;<br>    &lt;/<span class="hljs-keyword">label</span>&gt;<br>    &lt;<span class="hljs-keyword">label</span> <span class="hljs-keyword">for</span>=<span class="hljs-string">&quot;&quot;</span>&gt;<br>        &lt;<span class="hljs-keyword">input</span> <span class="hljs-keyword">type</span>=<span class="hljs-string">&quot;button&quot;</span> value=<span class="hljs-string">&quot;保存&quot;</span>&gt;<br>    &lt;/<span class="hljs-keyword">label</span>&gt;<br>&lt;/<span class="hljs-keyword">form</span>&gt;<br><br><br><span class="hljs-keyword">var</span> btn  = document.querySelector(&#x27;[<span class="hljs-keyword">type</span> = button]&#x27;);<br>btn.onclick = function() &#123;<br><span class="hljs-comment">// 文件元素</span><br><span class="hljs-keyword">var</span> <span class="hljs-keyword">file</span> = document.querySelector(&#x27;[<span class="hljs-keyword">type</span> = <span class="hljs-keyword">file</span>]&#x27;);<br><span class="hljs-comment">// 通过FormData将文件转成二进制数据</span><br><span class="hljs-keyword">var</span> formData = new FormData();<br>formData.<span class="hljs-keyword">append</span>(&#x27;upload&#x27;, <span class="hljs-keyword">file</span>.flies[0]);<br><span class="hljs-keyword">var</span> xhr = new XMLHttpRequest();<br>    <br>xhr.<span class="hljs-keyword">open</span>(&#x27;<span class="hljs-keyword">post</span>&#x27;,&#x27;<span class="hljs-keyword">file</span>.php&#x27;);  <span class="hljs-comment">// action = file.php</span><br><span class="hljs-comment">// 监听上传进度</span><br>xhr.upload.onprogress = function(ev) &#123;<br><span class="hljs-keyword">var</span> percent  = (ev.loaded / ev.<span class="hljs-keyword">total</span>) * 100 + &#x27;%&#x27; <span class="hljs-comment">// ev为事件对象</span><br>progress.style.width = percent;<br>&#125;<br>xhr.send(formData);<br>xhr.onreadystatechange = function()&#123;<br>        <span class="hljs-keyword">if</span>(xhr.readyState == 4)&#123;<br>            <span class="hljs-keyword">if</span>(xhr.status == 200)&#123;<br>                <span class="hljs-comment">//实际操作</span><br>            &#125;<br>        &#125;<br>    &#125; <br>&#125;<br><br></code></pre></td></tr></table></figure></li></ul></li><li><p><code>el-upload</code>搭配<code>FormData</code>实现自定义上传：</p><ul><li><p>通过<code>httpRequest</code>属性进行自定义上传，默认参数对象<code>param</code>的属性包括</p><figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs fortran"><span class="hljs-keyword">action</span>, <span class="hljs-keyword">data</span>, <span class="hljs-keyword">file</span>(即要上传的文件),filename, headers, onError, onProgress, onSuccess, withCredentials<br></code></pre></td></tr></table></figure></li><li><p>定义自定义上传方法</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-title function_">uploadHttpRequest</span>(<span class="hljs-params">param</span>) &#123;<br>  <span class="hljs-keyword">const</span> formData = <span class="hljs-keyword">new</span> <span class="hljs-title class_">FormData</span>();<br>  formData.<span class="hljs-title function_">append</span>(<span class="hljs-string">&quot;file&quot;</span>, param.<span class="hljs-property">file</span>); <span class="hljs-comment">// 添加文件对象</span><br>  <span class="hljs-title function_">importList</span>(formData)<br>    .<span class="hljs-title function_">then</span>(<span class="hljs-function">(<span class="hljs-params">res</span>) =&gt;</span> &#123;<br>      <span class="hljs-keyword">if</span> (res.<span class="hljs-property">code</span> === <span class="hljs-number">200</span>) &#123;<br>        param.<span class="hljs-title function_">onSuccess</span>(); <span class="hljs-comment">// 上传成功的文件显示绿色的对勾</span><br>        <span class="hljs-variable language_">this</span>.$message(&#123;<br>          <span class="hljs-attr">message</span>: <span class="hljs-string">&quot;导入成功！&quot;</span>,<br>          <span class="hljs-attr">type</span>: <span class="hljs-string">&quot;success&quot;</span>,<br>        &#125;);<br>      &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-keyword">const</span> errData = res.<span class="hljs-property">data</span>;<br>        <span class="hljs-variable language_">this</span>.<span class="hljs-property">errData</span> = errData;<br>        <span class="hljs-variable language_">this</span>.$message(&#123;<br>          <span class="hljs-attr">showClose</span>: <span class="hljs-literal">true</span>,<br>          <span class="hljs-attr">message</span>: <span class="hljs-variable language_">this</span>.<span class="hljs-property">errData</span>,<br>          <span class="hljs-attr">type</span>: <span class="hljs-string">&quot;error&quot;</span>,<br>        &#125;);<br>      &#125;<br>    &#125;)<br>    .<span class="hljs-title function_">catch</span>(<span class="hljs-function">(<span class="hljs-params">err</span>) =&gt;</span> &#123;<br>      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;失败&quot;</span>, err);<br>      param.<span class="hljs-title function_">onError</span>(); <span class="hljs-comment">// 上传失败的文件会从文件列表中删除</span><br>    &#125;);<br>&#125;,<br></code></pre></td></tr></table></figure></li></ul></li></ol>]]></content>
     
     
     <categories>
       
-      <category>源码</category>
+      <category>开发问题解决以及知识点积累</category>
       
     </categories>
     
     
     <tags>
       
-      <tag>Vue</tag>
+      <tag>知识点积累</tag>
       
     </tags>
     
@@ -55,13 +29,325 @@
   
   
   <entry>
-    <title>Hello World</title>
-    <link href="/2022/07/06/hello-world/"/>
-    <url>/2022/07/06/hello-world/</url>
+    <title>移动端落地页适配-小车地图移动</title>
+    <link href="/2022/07/17/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E5%BC%80%E5%8F%91%E8%90%BD%E5%9C%B0%E9%A1%B5%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/"/>
+    <url>/2022/07/17/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E5%BC%80%E5%8F%91%E8%90%BD%E5%9C%B0%E9%A1%B5%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/</url>
     
-    <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo new <span class="hljs-string">&quot;My New Post&quot;</span><br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo server<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo generate<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo deploy<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
+    <content type="html"><![CDATA[<h4 id="场景："><a href="#场景：" class="headerlink" title="场景："></a>场景：</h4><p>​小车在地图上不断前进，每走到一个标记点，停下。地图原始比例为：宽1080 高1920</p><h4 id="1-问题"><a href="#1-问题" class="headerlink" title="(1) 问题"></a>(1) 问题</h4><ol><li><p>移动端适配，保证不同手机屏幕上地图比例不变</p></li><li><p>设置样式时，涉及到单位的地方要进行换算：<code>px -&gt; vh/vw</code></p></li><li><p>不同移动端，小车起始位置像素可能不一致，需要动态设置动画</p></li><li><p>实现小车的精准移动</p></li><li><p>实现小车的停止和前进</p></li><li><p>实现小车镜像翻转，镜像翻转无法通过以下动画实现</p><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs css"><span class="hljs-keyword">@keyframes</span> trans180 &#123;<br>    <span class="hljs-number">0%</span> &#123;<br>        <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">rotateY</span>(<span class="hljs-number">0deg</span>);<br>    &#125;<br><br>    <span class="hljs-number">100%</span> &#123;<br>        <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">rotateY</span>(<span class="hljs-number">180deg</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure></li></ol><h4 id="2-解决方案"><a href="#2-解决方案" class="headerlink" title="(2) 解决方案"></a>(2) 解决方案</h4><ol><li><h5 id="针对问题一：以地图原始比例的宽或高作为基准，将像素px换算成单位vh-vw"><a href="#针对问题一：以地图原始比例的宽或高作为基准，将像素px换算成单位vh-vw" class="headerlink" title="针对问题一：以地图原始比例的宽或高作为基准，将像素px换算成单位vh/vw"></a>针对问题一：以地图原始比例的宽或高作为基准，将像素<code>px</code>换算成单位<code>vh/vw</code></h5><figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs arcade"><span class="hljs-keyword">if</span> ((mediaW / mediaH) &gt; (<span class="hljs-number">1080</span> / <span class="hljs-number">1920</span>)) &#123;<br>    <span class="hljs-keyword">var</span> perVh = <span class="hljs-number">1920</span> / <span class="hljs-number">100</span>;<br>    <span class="hljs-keyword">var</span> position = Math.<span class="hljs-built_in">round</span>(<span class="hljs-built_in">number</span> / perVh, <span class="hljs-number">4</span>) + <span class="hljs-string">&#x27;vh&#x27;</span><br>&#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-keyword">var</span> perVw =<span class="hljs-number">1080</span> / <span class="hljs-number">100</span>;<br>    <span class="hljs-keyword">var</span> position = Math.<span class="hljs-built_in">round</span>(<span class="hljs-built_in">number</span> / perVw, <span class="hljs-number">4</span>) + <span class="hljs-string">&#x27;vw&#x27;</span><br>&#125;<br></code></pre></td></tr></table></figure><p>原理：<code>mediaW</code>和 <code>mediaH</code>分别为手机显示窗口的宽高。若手机宽高比&gt;地图宽高比，说明在地图高度占满全屏的情况下，宽度不能占满，此时则以地图高为基准，整屏高是<code>100vh</code>，将设计图上的<code>px</code>均换算为<code>vh</code>作为单位来表示；反之则以地图宽度为基准，整屏宽为<code>100vw</code>，将设计图上的<code>px</code>均换算为<code>vw</code>作为单位来表示；同时保持地图始终居中</p></li><li><h5 id="针对问题2：定义单位换算的函数，通过js操作DOM动态设置宽高以及相对位置"><a href="#针对问题2：定义单位换算的函数，通过js操作DOM动态设置宽高以及相对位置" class="headerlink" title="针对问题2：定义单位换算的函数，通过js操作DOM动态设置宽高以及相对位置"></a>针对问题2：定义单位换算的函数，通过<code>js</code>操作<code>DOM</code>动态设置宽高以及相对位置</h5><figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs reasonml"><span class="hljs-constructor">$(<span class="hljs-string">&quot;.title&quot;</span>)</span>.css(&#123; <span class="hljs-string">&quot;width&quot;</span>: compute<span class="hljs-constructor">PX(790)</span>, <span class="hljs-string">&quot;top&quot;</span>: compute<span class="hljs-constructor">PX(80)</span>, <span class="hljs-string">&quot;left&quot;</span>: compute<span class="hljs-constructor">PX(50)</span> &#125;)<br></code></pre></td></tr></table></figure></li><li><h5 id="针对问题3：通过style-insertRule动态设置动画"><a href="#针对问题3：通过style-insertRule动态设置动画" class="headerlink" title="针对问题3：通过style.insertRule动态设置动画"></a>针对问题3：通过<code>style.insertRule</code>动态设置动画</h5><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs css">style<span class="hljs-selector-class">.insertRule</span>(`<span class="hljs-keyword">@keyframes</span> moveToMarkR$&#123;cur&#125;&#123;<span class="hljs-number">0%</span>&#123;<span class="hljs-attribute">left</span>:$&#123;currentX&#125;;<span class="hljs-attribute">top</span>:$&#123;currentY&#125;;&#125;<span class="hljs-number">100%</span> &#123;<span class="hljs-attribute">left</span>:$&#123;moveCalc(currentX, <span class="hljs-number">252</span>)&#125;; <span class="hljs-attribute">top</span>:$&#123;currentY&#125;;&#125;&#125;`)<br></code></pre></td></tr></table></figure></li><li><h5 id="针对问题4：每一步动画都是在上一步基础上，加上地图上的移动距离（经过单位换算之后，单位为vh-x2F-vw），通过jQuery的-css-或-offset-方法所获取到当前位置，所得值为vh-vw转换之后的实际像素值，无法直接与移动距离相加"><a href="#针对问题4：每一步动画都是在上一步基础上，加上地图上的移动距离（经过单位换算之后，单位为vh-x2F-vw），通过jQuery的-css-或-offset-方法所获取到当前位置，所得值为vh-vw转换之后的实际像素值，无法直接与移动距离相加" class="headerlink" title="针对问题4：每一步动画都是在上一步基础上，加上地图上的移动距离（经过单位换算之后，单位为vh&#x2F;vw），通过jQuery的.css()或.offset()方法所获取到当前位置，所得值为vh/vw转换之后的实际像素值，无法直接与移动距离相加"></a>针对问题4：每一步动画都是在上一步基础上，加上地图上的<strong>移动距离</strong>（经过单位换算之后，单位为<code>vh</code>&#x2F;<code>vw</code>），通过<code>jQuery</code>的<code>.css()</code>或<code>.offset()</code>方法所获取到当前位置，所得值为<code>vh/vw</code>转换之后的实际像素值，无法直接与<strong>移动距离</strong>相加</h5><ul><li><p>先将实际像素值转换为<code>vh/vw</code>单位</p><figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs arcade"><span class="hljs-keyword">if</span> ((mediaW / mediaH) &gt; (<span class="hljs-number">1080</span> / <span class="hljs-number">1920</span>)) &#123;<br>    <span class="hljs-keyword">var</span> perVh = mediaH / <span class="hljs-number">100</span>;<br>    <span class="hljs-keyword">var</span> position = Math.<span class="hljs-built_in">round</span>(<span class="hljs-built_in">number</span> / perVh, <span class="hljs-number">4</span>) + <span class="hljs-string">&#x27;vh&#x27;</span><br>&#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-keyword">var</span> perVw = mediaW / <span class="hljs-number">100</span>;<br>    <span class="hljs-keyword">var</span> position = Math.<span class="hljs-built_in">round</span>(<span class="hljs-built_in">number</span> / perVw, <span class="hljs-number">4</span>) + <span class="hljs-string">&#x27;vw&#x27;</span><br>&#125;<br><span class="hljs-keyword">return</span> position;<br></code></pre></td></tr></table></figure><p>原理：假如自适应是以<code>vh</code>作为单位，通过当前屏幕的宽度像素，除以100即可得出每<code>vh</code>实际像素是多少，下一步即可通过实际像素换算成对应的<code>vh</code></p></li><li><p>对<strong>移动距离</strong>进行换算</p><ul><li>若以<code>vh</code>作为单位时，因为地图宽度并未撑满全屏，所以不能直接用换算公式进行换算。需要算出1080为多少<code>vh</code>，然后乘以比例<code>移动距离/1080</code></li><li>若以<code>vw</code>作为单位，直接用公式进行换算即可</li></ul></li></ul></li><li><h4 id="针对问题5："><a href="#针对问题5：" class="headerlink" title="针对问题5："></a>针对问题5：</h4><ul><li><p><code>step1</code>：将地图分为多个点，在不同的点分别添加动画：向右&#x2F;左直走至下一个标记、向右&#x2F;左直走至拐角、向下、镜像旋转</p></li><li><p><code>step2</code>：监听动画结束事件<code>webkitAnimationEnd</code>，异步调用回调函数，回调函数执行完，成功回传参数后，执行添加下一个动画的操作</p><figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs reasonml"><span class="hljs-keyword">function</span> imple<span class="hljs-constructor">Animation(<span class="hljs-params">count</span>)</span> &#123;<br>    return <span class="hljs-keyword">new</span> <span class="hljs-constructor">Promise((<span class="hljs-params">resolve</span>, <span class="hljs-params">reject</span>)</span> =&gt; &#123;<br>        show<span class="hljs-constructor">Question(<span class="hljs-params">count</span>, <span class="hljs-params">resolve</span>)</span>   <span class="hljs-comment">// showQuestion第二个参数(resolve)执行时，该Promise对象即可执行.then操作，根据回传参数进行下一步操作</span><br>    &#125;)<br>&#125;<br></code></pre></td></tr></table></figure></li></ul></li><li><p>针对问题6：先执行<code>transform</code>进行翻转，再执行动画</p><ul><li><p>向左镜像翻转</p><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs css">先执行以下<span class="hljs-attribute">transform</span>，<br>car<span class="hljs-selector-class">.css</span>(&quot;<span class="hljs-attribute">transform</span>&quot;, &quot;rotateY(<span class="hljs-number">180deg</span>)&quot;)<br><br>再执行动画<br><span class="hljs-keyword">@keyframes</span> trans180 &#123;<br>    <span class="hljs-number">0%</span> &#123;<br>        <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">rotateY</span>(<span class="hljs-number">0deg</span>);<br>    &#125;<br><br>    <span class="hljs-number">100%</span> &#123;<br>        <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">rotateY</span>(<span class="hljs-number">180deg</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure></li><li><p>向右镜像翻转</p><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs css">先执行以下<span class="hljs-attribute">transform</span>，<br>car<span class="hljs-selector-class">.css</span>(&quot;<span class="hljs-attribute">transform</span>&quot;, &quot;rotateY(<span class="hljs-number">0deg</span>)&quot;)<br><br>再执行动画<br><span class="hljs-keyword">@keyframes</span> transMinus180 &#123;<br>    <span class="hljs-number">0%</span> &#123;<br>        <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">rotateY</span>(<span class="hljs-number">180deg</span>);<br>    &#125;<br><br>    <span class="hljs-number">100%</span> &#123;<br>        <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">rotateY</span>(<span class="hljs-number">0deg</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure></li></ul></li></ol>]]></content>
     
     
+    <categories>
+      
+      <category>开发问题解决以及知识点积累</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>问题解决</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>移动端落地页适配-小车地图移动</title>
+    <link href="/2022/07/17/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E8%90%BD%E5%9C%B0%E9%A1%B5%E9%80%82%E9%85%8D-%E5%B0%8F%E8%BD%A6%E5%9C%B0%E5%9B%BE%E7%A7%BB%E5%8A%A8/"/>
+    <url>/2022/07/17/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E8%90%BD%E5%9C%B0%E9%A1%B5%E9%80%82%E9%85%8D-%E5%B0%8F%E8%BD%A6%E5%9C%B0%E5%9B%BE%E7%A7%BB%E5%8A%A8/</url>
+    
+    <content type="html"><![CDATA[<h4 id="场景："><a href="#场景：" class="headerlink" title="场景："></a>场景：</h4><p>​小车在地图上不断前进，每走到一个标记点，停下。地图原始比例为：宽1080 高1920</p><h4 id="1-问题"><a href="#1-问题" class="headerlink" title="(1) 问题"></a>(1) 问题</h4><ol><li><p>移动端适配，保证不同手机屏幕上地图比例不变</p></li><li><p>设置样式时，涉及到单位的地方要进行换算：<code>px -&gt; vh/vw</code></p></li><li><p>不同移动端，小车起始位置像素可能不一致，需要动态设置动画</p></li><li><p>实现小车的精准移动</p></li><li><p>实现小车的停止和前进</p></li><li><p>实现小车镜像翻转，镜像翻转无法通过以下动画实现</p><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs css"><span class="hljs-keyword">@keyframes</span> trans180 &#123;<br>    <span class="hljs-number">0%</span> &#123;<br>        <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">rotateY</span>(<span class="hljs-number">0deg</span>);<br>    &#125;<br><br>    <span class="hljs-number">100%</span> &#123;<br>        <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">rotateY</span>(<span class="hljs-number">180deg</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure></li></ol><h4 id="2-解决方案"><a href="#2-解决方案" class="headerlink" title="(2) 解决方案"></a>(2) 解决方案</h4><ol><li><h5 id="针对问题一：以地图原始比例的宽或高作为基准，将像素px换算成单位vh-vw"><a href="#针对问题一：以地图原始比例的宽或高作为基准，将像素px换算成单位vh-vw" class="headerlink" title="针对问题一：以地图原始比例的宽或高作为基准，将像素px换算成单位vh/vw"></a>针对问题一：以地图原始比例的宽或高作为基准，将像素<code>px</code>换算成单位<code>vh/vw</code></h5><figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs arcade"><span class="hljs-keyword">if</span> ((mediaW / mediaH) &gt; (<span class="hljs-number">1080</span> / <span class="hljs-number">1920</span>)) &#123;<br>    <span class="hljs-keyword">var</span> perVh = <span class="hljs-number">1920</span> / <span class="hljs-number">100</span>;<br>    <span class="hljs-keyword">var</span> position = Math.<span class="hljs-built_in">round</span>(<span class="hljs-built_in">number</span> / perVh, <span class="hljs-number">4</span>) + <span class="hljs-string">&#x27;vh&#x27;</span><br>&#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-keyword">var</span> perVw =<span class="hljs-number">1080</span> / <span class="hljs-number">100</span>;<br>    <span class="hljs-keyword">var</span> position = Math.<span class="hljs-built_in">round</span>(<span class="hljs-built_in">number</span> / perVw, <span class="hljs-number">4</span>) + <span class="hljs-string">&#x27;vw&#x27;</span><br>&#125;<br></code></pre></td></tr></table></figure><p>原理：<code>mediaW</code>和 <code>mediaH</code>分别为手机显示窗口的宽高。若手机宽高比&gt;地图宽高比，说明在地图高度占满全屏的情况下，宽度不能占满，此时则以地图高为基准，整屏高是<code>100vh</code>，将设计图上的<code>px</code>均换算为<code>vh</code>作为单位来表示；反之则以地图宽度为基准，整屏宽为<code>100vw</code>，将设计图上的<code>px</code>均换算为<code>vw</code>作为单位来表示；同时保持地图始终居中</p></li><li><h5 id="针对问题2：定义单位换算的函数，通过js操作DOM动态设置宽高以及相对位置"><a href="#针对问题2：定义单位换算的函数，通过js操作DOM动态设置宽高以及相对位置" class="headerlink" title="针对问题2：定义单位换算的函数，通过js操作DOM动态设置宽高以及相对位置"></a>针对问题2：定义单位换算的函数，通过<code>js</code>操作<code>DOM</code>动态设置宽高以及相对位置</h5><figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs reasonml"><span class="hljs-constructor">$(<span class="hljs-string">&quot;.title&quot;</span>)</span>.css(&#123; <span class="hljs-string">&quot;width&quot;</span>: compute<span class="hljs-constructor">PX(790)</span>, <span class="hljs-string">&quot;top&quot;</span>: compute<span class="hljs-constructor">PX(80)</span>, <span class="hljs-string">&quot;left&quot;</span>: compute<span class="hljs-constructor">PX(50)</span> &#125;)<br></code></pre></td></tr></table></figure></li><li><h5 id="针对问题3：通过style-insertRule动态设置动画"><a href="#针对问题3：通过style-insertRule动态设置动画" class="headerlink" title="针对问题3：通过style.insertRule动态设置动画"></a>针对问题3：通过<code>style.insertRule</code>动态设置动画</h5><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs css">style<span class="hljs-selector-class">.insertRule</span>(`<span class="hljs-keyword">@keyframes</span> moveToMarkR$&#123;cur&#125;&#123;<span class="hljs-number">0%</span>&#123;<span class="hljs-attribute">left</span>:$&#123;currentX&#125;;<span class="hljs-attribute">top</span>:$&#123;currentY&#125;;&#125;<span class="hljs-number">100%</span> &#123;<span class="hljs-attribute">left</span>:$&#123;moveCalc(currentX, <span class="hljs-number">252</span>)&#125;; <span class="hljs-attribute">top</span>:$&#123;currentY&#125;;&#125;&#125;`)<br></code></pre></td></tr></table></figure></li><li><h5 id="针对问题4：每一步动画都是在上一步基础上，加上地图上的移动距离（经过单位换算之后，单位为vh-x2F-vw），通过jQuery的-css-或-offset-方法所获取到当前位置，所得值为vh-vw转换之后的实际像素值，无法直接与移动距离相加"><a href="#针对问题4：每一步动画都是在上一步基础上，加上地图上的移动距离（经过单位换算之后，单位为vh-x2F-vw），通过jQuery的-css-或-offset-方法所获取到当前位置，所得值为vh-vw转换之后的实际像素值，无法直接与移动距离相加" class="headerlink" title="针对问题4：每一步动画都是在上一步基础上，加上地图上的移动距离（经过单位换算之后，单位为vh&#x2F;vw），通过jQuery的.css()或.offset()方法所获取到当前位置，所得值为vh/vw转换之后的实际像素值，无法直接与移动距离相加"></a>针对问题4：每一步动画都是在上一步基础上，加上地图上的<strong>移动距离</strong>（经过单位换算之后，单位为<code>vh</code>&#x2F;<code>vw</code>），通过<code>jQuery</code>的<code>.css()</code>或<code>.offset()</code>方法所获取到当前位置，所得值为<code>vh/vw</code>转换之后的实际像素值，无法直接与<strong>移动距离</strong>相加</h5><ul><li><p>先将实际像素值转换为<code>vh/vw</code>单位</p><figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs arcade"><span class="hljs-keyword">if</span> ((mediaW / mediaH) &gt; (<span class="hljs-number">1080</span> / <span class="hljs-number">1920</span>)) &#123;<br>    <span class="hljs-keyword">var</span> perVh = mediaH / <span class="hljs-number">100</span>;<br>    <span class="hljs-keyword">var</span> position = Math.<span class="hljs-built_in">round</span>(<span class="hljs-built_in">number</span> / perVh, <span class="hljs-number">4</span>) + <span class="hljs-string">&#x27;vh&#x27;</span><br>&#125; <span class="hljs-keyword">else</span> &#123;<br>    <span class="hljs-keyword">var</span> perVw = mediaW / <span class="hljs-number">100</span>;<br>    <span class="hljs-keyword">var</span> position = Math.<span class="hljs-built_in">round</span>(<span class="hljs-built_in">number</span> / perVw, <span class="hljs-number">4</span>) + <span class="hljs-string">&#x27;vw&#x27;</span><br>&#125;<br><span class="hljs-keyword">return</span> position;<br></code></pre></td></tr></table></figure><p>原理：假如自适应是以<code>vh</code>作为单位，通过当前屏幕的宽度像素，除以100即可得出每<code>vh</code>实际像素是多少，下一步即可通过实际像素换算成对应的<code>vh</code></p></li><li><p>对<strong>移动距离</strong>进行换算</p><ul><li>若以<code>vh</code>作为单位时，因为地图宽度并未撑满全屏，所以不能直接用换算公式进行换算。需要算出1080为多少<code>vh</code>，然后乘以比例<code>移动距离/1080</code></li><li>若以<code>vw</code>作为单位，直接用公式进行换算即可</li></ul></li></ul></li><li><h4 id="针对问题5："><a href="#针对问题5：" class="headerlink" title="针对问题5："></a>针对问题5：</h4><ul><li><p><code>step1</code>：将地图分为多个点，在不同的点分别添加动画：向右&#x2F;左直走至下一个标记、向右&#x2F;左直走至拐角、向下、镜像旋转</p></li><li><p><code>step2</code>：监听动画结束事件<code>webkitAnimationEnd</code>，异步调用回调函数，回调函数执行完，成功回传参数后，执行添加下一个动画的操作</p><figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs reasonml"><span class="hljs-keyword">function</span> imple<span class="hljs-constructor">Animation(<span class="hljs-params">count</span>)</span> &#123;<br>    return <span class="hljs-keyword">new</span> <span class="hljs-constructor">Promise((<span class="hljs-params">resolve</span>, <span class="hljs-params">reject</span>)</span> =&gt; &#123;<br>        show<span class="hljs-constructor">Question(<span class="hljs-params">count</span>, <span class="hljs-params">resolve</span>)</span>   <span class="hljs-comment">// showQuestion第二个参数(resolve)执行时，该Promise对象即可执行.then操作，根据回传参数进行下一步操作</span><br>    &#125;)<br>&#125;<br></code></pre></td></tr></table></figure></li></ul></li><li><p>针对问题6：先执行<code>transform</code>进行翻转，再执行动画</p><ul><li><p>向左镜像翻转</p><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs css">先执行以下<span class="hljs-attribute">transform</span>，<br>car<span class="hljs-selector-class">.css</span>(&quot;<span class="hljs-attribute">transform</span>&quot;, &quot;rotateY(<span class="hljs-number">180deg</span>)&quot;)<br><br>再执行动画<br><span class="hljs-keyword">@keyframes</span> trans180 &#123;<br>    <span class="hljs-number">0%</span> &#123;<br>        <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">rotateY</span>(<span class="hljs-number">0deg</span>);<br>    &#125;<br><br>    <span class="hljs-number">100%</span> &#123;<br>        <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">rotateY</span>(<span class="hljs-number">180deg</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure></li><li><p>向右镜像翻转</p><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs css">先执行以下<span class="hljs-attribute">transform</span>，<br>car<span class="hljs-selector-class">.css</span>(&quot;<span class="hljs-attribute">transform</span>&quot;, &quot;rotateY(<span class="hljs-number">0deg</span>)&quot;)<br><br>再执行动画<br><span class="hljs-keyword">@keyframes</span> transMinus180 &#123;<br>    <span class="hljs-number">0%</span> &#123;<br>        <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">rotateY</span>(<span class="hljs-number">180deg</span>);<br>    &#125;<br><br>    <span class="hljs-number">100%</span> &#123;<br>        <span class="hljs-attribute">transform</span>: <span class="hljs-built_in">rotateY</span>(<span class="hljs-number">0deg</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure></li></ul></li></ol>]]></content>
+    
+    
+    <categories>
+      
+      <category>开发问题解决以及知识点积累</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>问题解决</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>使用flex布局和nth-child的注意问题</title>
+    <link href="/2022/07/17/%E4%BD%BF%E7%94%A8flex%E5%B8%83%E5%B1%80%E5%92%8Cnth-child%E7%9A%84%E6%B3%A8%E6%84%8F%E9%97%AE%E9%A2%98/"/>
+    <url>/2022/07/17/%E4%BD%BF%E7%94%A8flex%E5%B8%83%E5%B1%80%E5%92%8Cnth-child%E7%9A%84%E6%B3%A8%E6%84%8F%E9%97%AE%E9%A2%98/</url>
+    
+    <content type="html"><![CDATA[<h4 id="1-问题"><a href="#1-问题" class="headerlink" title="(1) 问题"></a>(1) 问题</h4><ol><li>用flex布局时，左边图片右边文字，给图片盒子设置了宽度，但渲染后图片盒子宽度缩小了，且宽度是不固定的</li><li><code>ul</code>盒子包裹一个<code>img</code>标签和多个<code>li</code>标签，使用<code>nth-child(1)</code>设置第一个<code>li</code>标签样式无效</li></ol><h4 id="2-解决"><a href="#2-解决" class="headerlink" title="(2) 解决"></a>(2) 解决</h4><ol><li><p>针对问题一：使用flex布局时，多个盒子都要设置宽度</p></li><li><p>针对问题二：注意<code>nth-child(n)</code>和<code>nth-of-type(n)</code>的区别</p><ul><li><p><code>nth-child(n)</code>: 找到当前元素的所有兄弟元素，用<code>n</code>来筛选出在当前元素的兄弟元素节点的位置。</p><ul><li><p><code>p:nth-child(2)</code></p><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs css">&lt;<span class="hljs-selector-tag">p</span>&gt;第一个&lt;/<span class="hljs-selector-tag">p</span>&gt;<br>&lt;<span class="hljs-selector-tag">h1</span>&gt;<span class="hljs-selector-tag">h1</span>标题&lt;/<span class="hljs-selector-tag">h1</span>&gt;<br>&lt;<span class="hljs-selector-tag">p</span>&gt;第二个&lt;/<span class="hljs-selector-tag">p</span>&gt;<br></code></pre></td></tr></table></figure></li><li><p><code>p:nth-child(2)</code>:可以理解为匹配属于<code>p</code>父元素的第二个子元素的所有<code>p</code>。但第二个兄弟节点是<code>&lt;h1&gt;</code>元素，所以取不到<code>p:nth-child(2)</code>。具体过程可以理解为：</p><ul><li>找到<code>p</code>父元素下所有的子元素</li><li>找到第二个元素</li><li>匹配标签选择器<code>p</code>，若匹配到了则选中</li></ul></li></ul></li><li><p><code>nth-of-type(n)</code>：针对具有一组兄弟节点的标签，用<code>n</code>来筛选出在一组兄弟节点中的位置</p><ul><li><p><code>p:nth-of-type(2)</code></p><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs css">&lt;<span class="hljs-selector-tag">p</span>&gt;第一个&lt;/<span class="hljs-selector-tag">p</span>&gt;<br>&lt;<span class="hljs-selector-tag">h1</span>&gt;<span class="hljs-selector-tag">h1</span>标题&lt;/<span class="hljs-selector-tag">h1</span>&gt;<br>&lt;<span class="hljs-selector-tag">p</span>&gt;第二个&lt;/<span class="hljs-selector-tag">p</span>&gt;<br></code></pre></td></tr></table></figure></li><li><p><code>p:nth-of-type(2)</code>:可以理解为匹配属于<code>p</code>父元素的第二个<code>p</code>的每个<code>p</code>。所以会选中<code>&lt;p&gt;第二个&lt;/p&gt;</code>。具体过程可以理解为：</p><ul><li><p>找到<code>p</code>父元素下所有的子元素</p></li><li><p>按标签名找到分组：</p><ul><li><p><code>p</code>标签组</p><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>第一个<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>第二个<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span><br></code></pre></td></tr></table></figure></li></ul></li><li><p>找到第<code>2</code>个元素，若找到则选中</p></li></ul></li></ul></li></ul></li></ol>]]></content>
+    
+    
+    <categories>
+      
+      <category>开发问题解决以及知识点积累</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>问题解决</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Vue2中修改vant-ui样式无效</title>
+    <link href="/2022/07/17/Vue2%E4%B8%AD%E4%BF%AE%E6%94%B9vant-ui%E6%A0%B7%E5%BC%8F%E6%97%A0%E6%95%88/"/>
+    <url>/2022/07/17/Vue2%E4%B8%AD%E4%BF%AE%E6%94%B9vant-ui%E6%A0%B7%E5%BC%8F%E6%97%A0%E6%95%88/</url>
+    
+    <content type="html"><![CDATA[<h4 id="1-问题："><a href="#1-问题：" class="headerlink" title="(1) 问题："></a>(1) 问题：</h4><p>​<code>Vue2</code>中使用<code>vant ui</code>(版本<code>2.12.26</code>)时，想修改样式但无效</p><h4 id="（2）解决办法："><a href="#（2）解决办法：" class="headerlink" title="（2）解决办法："></a>（2）解决办法：</h4><ol><li>尝试在<code>.vue</code>文件里直接修改(<code>lang=&quot;less&quot; scoped</code>)， 无效</li><li>尝试加<code>v-deep</code>  或 <code>/deep/</code>， 无效</li><li>尝试全局建一个<code>resetvant.less</code>，并在<code>main.js</code>中引入，无效</li><li><strong>最终解决</strong>：全局建<code>resetvant.css</code>文件，并在<code>main.js</code>中引入,，生效</li></ol>]]></content>
+    
+    
+    <categories>
+      
+      <category>提高开发效率</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>第三方库使用</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>在Vue项目中动态的增删DOM元素</title>
+    <link href="/2022/07/17/%E5%9C%A8Vue%E9%A1%B9%E7%9B%AE%E4%B8%AD%E5%8A%A8%E6%80%81%E7%9A%84%E5%A2%9E%E5%88%A0DOM%E5%85%83%E7%B4%A0/"/>
+    <url>/2022/07/17/%E5%9C%A8Vue%E9%A1%B9%E7%9B%AE%E4%B8%AD%E5%8A%A8%E6%80%81%E7%9A%84%E5%A2%9E%E5%88%A0DOM%E5%85%83%E7%B4%A0/</url>
+    
+    <content type="html"><![CDATA[<h4 id="1-问题"><a href="#1-问题" class="headerlink" title="(1) 问题"></a>(1) 问题</h4><p>​在某些应用场景中，想动态实现<code>DOM</code>结构的增加和删除，如图<img src="/2022/07/17/%E5%9C%A8Vue%E9%A1%B9%E7%9B%AE%E4%B8%AD%E5%8A%A8%E6%80%81%E7%9A%84%E5%A2%9E%E5%88%A0DOM%E5%85%83%E7%B4%A0/image-20220224170542446.png" alt="image-20220224170542446"></p><h4 id="2-解决方案："><a href="#2-解决方案：" class="headerlink" title="(2) 解决方案："></a>(2) 解决方案：</h4><ol><li>在<code>data</code>中绑定一个对象数组，同时在模板中绑定该对象数组，通过<code>v-for</code>渲染</li><li>通过<code>js</code>数组的<code>splice</code>和<code>push</code>操作实现动态的增删</li></ol>]]></content>
+    
+    
+    <categories>
+      
+      <category>开发问题解决以及知识点积累</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>问题解决</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>首屏加载hover切换图片延迟</title>
+    <link href="/2022/07/15/%E9%A6%96%E5%B1%8F%E5%8A%A0%E8%BD%BDhover%E5%88%87%E6%8D%A2%E5%9B%BE%E7%89%87%E5%BB%B6%E8%BF%9F/"/>
+    <url>/2022/07/15/%E9%A6%96%E5%B1%8F%E5%8A%A0%E8%BD%BDhover%E5%88%87%E6%8D%A2%E5%9B%BE%E7%89%87%E5%BB%B6%E8%BF%9F/</url>
+    
+    <content type="html"><![CDATA[<h4 id="1-问题"><a href="#1-问题" class="headerlink" title="(1) 问题"></a>(1) 问题</h4><p>想在<code>hover</code>的时候切换<code>img</code>标签的<code>url</code>，但首屏加载时之后进行hover操作时，总会出现一些延迟，怀疑是网络请求加载导致</p><h4 id="2-解决方案"><a href="#2-解决方案" class="headerlink" title="(2) 解决方案"></a>(2) 解决方案</h4><ol><li><p>通过图片预先请求来解决</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-title function_">mounted</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">preload</span>(); <br>&#125;,<br><span class="hljs-attr">methods</span>: &#123;<br>    <span class="hljs-title function_">preload</span>(<span class="hljs-params"></span>) &#123;<br>      <span class="hljs-keyword">let</span> preLoadList = [<br>        url1,<br>        url2,<br>        ...<br>      ];<br>      preLoadList.<span class="hljs-title function_">forEach</span>(<span class="hljs-function">(<span class="hljs-params">img</span>) =&gt;</span> &#123;<br>        <span class="hljs-keyword">let</span> image = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Image</span>();<br>        image.<span class="hljs-property">src</span> = img;<br>        image.<span class="hljs-property">onload</span> = <span class="hljs-function">() =&gt;</span> &#123;<br>          <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;加载成功&quot;</span>);<br>        &#125;;<br>      &#125;);<br>    &#125;,<br>&#125;<br></code></pre></td></tr></table></figure></li><li><p>隐藏未选中图片</p><p>同时加载需要进行切换的几张图片，隐藏非默认展示的图片。隐藏元素的几种操作方式的区别</p><ul><li><code>display:none</code><ul><li>隐藏之后不占位置</li><li>不会被子元素继承，父元素不存在，子元素也不会显示出</li><li>无法触发元素的绑定事件</li><li><code>transition</code>无效</li></ul></li><li><code>visibility: hidden</code><ul><li>隐藏之后占据位置</li><li>会被子元素继承，通过设置子元素<code>visibility:visible</code>来显示子元素</li><li>无法触发元素的绑定事件</li><li><code>transition</code>无效</li></ul></li><li><code>opacity: 0</code><ul><li>隐藏之后占据位置</li><li>会被子元素继承，但<strong>无法</strong>通过设置子元素<code>opacity:0</code>来重新显示</li><li>可以触发元素的绑定事件</li><li><code>transition</code>有效</li></ul></li></ul></li></ol>]]></content>
+    
+    
+    <categories>
+      
+      <category>开发问题解决以及知识点积累</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>问题解决</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Vue2.x数据驱动</title>
+    <link href="/2022/07/15/Vue2-x%E6%95%B0%E6%8D%AE%E9%A9%B1%E5%8A%A8/"/>
+    <url>/2022/07/15/Vue2-x%E6%95%B0%E6%8D%AE%E9%A9%B1%E5%8A%A8/</url>
+    
+    <content type="html"><![CDATA[<h4 id="1-new-Vue之后发生了什么？"><a href="#1-new-Vue之后发生了什么？" class="headerlink" title="(1) new Vue之后发生了什么？"></a>(1) <code>new Vue</code>之后发生了什么？</h4><ol><li>定位到采用<code>Function</code>实现的<code>Vue</code>类，主要逻辑是调用了<code>this._init()</code>方法进行初始化</li><li><code>_init()</code>方法主要实现了：<ul><li>合并配置、初始化生命周期、初始化事件中心、初始化渲染、初始化<code>data props computed watcher</code>等等</li></ul></li></ol><h4 id="2-Vue挂载"><a href="#2-Vue挂载" class="headerlink" title="(2) Vue挂载"></a>(2)<code> Vue</code>挂载</h4><ol><li><code>compiler</code>版本的<code>Vuejs</code>：先对原来原型上的<code>$mount</code>进行一个扩展(添加一个在线编译的过程)，然后调用原来原型上的<code>$mount</code>进行挂载</li><li><code>$mount</code>的实现主要是调用<code>mountComponent</code>方法，该函数主要逻辑：<ul><li>实例化一个<code>Watcher</code>， 其回调函数会调用<code>updateComponent</code>方法</li><li>实现<code>updateComponent</code>主要逻辑<ul><li>调用<code>vm._render()</code>生成<code>VNode</code></li><li>调用<code>vm._update()</code>更新<code>DOM</code></li></ul></li><li>判断实例是否已挂载</li></ul></li></ol><h4 id="3-render"><a href="#3-render" class="headerlink" title="(3)render"></a>(3)<code>render</code></h4><ol><li><p><code>vm._render</code>的主要逻辑是调用<code>render</code>函数（(1) 为用户手写的<code>render</code>函数，或者(2) 在扩展的<code>$mount</code>中，由<code>el</code>或<code>template</code>转换成的<code>render</code>函数。<code>render</code>函数通过<code>vm.$options</code>访问），参数为<code>vm.$createElement</code></p><ul><li><p><code>vm.$createElement</code>主要逻辑是调用<code>createElement</code>方法，值得注意的是</p><figure class="highlight reasonml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs reasonml"><span class="hljs-comment">// 被模板编译成的render函数使用</span><br>vm._c =<span class="hljs-function"> (<span class="hljs-params">a</span>, <span class="hljs-params">b</span>, <span class="hljs-params">c</span>, <span class="hljs-params">d</span>) =&gt;</span> create<span class="hljs-constructor">Element(<span class="hljs-params">vm</span>, <span class="hljs-params">a</span>, <span class="hljs-params">b</span>, <span class="hljs-params">c</span>, <span class="hljs-params">d</span>, <span class="hljs-params">false</span>)</span><br><br><span class="hljs-comment">// 被用户手写的render函数使用</span><br>vm.$createElement =<span class="hljs-function"> (<span class="hljs-params">a</span>, <span class="hljs-params">b</span>, <span class="hljs-params">c</span>, <span class="hljs-params">d</span>) =&gt;</span> create<span class="hljs-constructor">Element(<span class="hljs-params">vm</span>, <span class="hljs-params">a</span>, <span class="hljs-params">b</span>, <span class="hljs-params">c</span>, <span class="hljs-params">d</span>, <span class="hljs-params">true</span>)</span><br></code></pre></td></tr></table></figure><p><strong>疑问：为什么没有调用<code>vm._c</code>?</strong></p></li></ul></li><li><p><code>createElement</code>创建<code>VNode</code>的过程主要包括</p><ul><li>规范化当前<code>VNode</code>的子节点<code>children</code>，将其变为一个类型为<code>VNode</code>的<code>Array</code>。每个<code>VNode</code>有<code>children</code>，<code>children</code>中每个元素也是一个<code>VNode</code>，这样就形成了一个<code>VNode Tree</code></li><li>根据当前<code>tag</code>类型，实例化一个普通<code>VNode</code>节点，或调用<code>createComponent</code>方法创建一个组件<code>VNode</code></li></ul></li><li><p>总结</p><ul><li><code>vm._render</code>最终通过执行<code>createElement</code>方法返回<code>vnode</code></li></ul></li></ol><h4 id="4-update"><a href="#4-update" class="headerlink" title="(4) update"></a>(4) <code>update</code></h4><ol><li><code>vm._update</code>的主要逻辑是调用<code>vm._patch_</code>方法(分为初次渲染和更新两种情况)</li><li><code>vm._patch_</code>的最终实现逻辑：<ul><li>递归的调用<code>createElm</code>方法生成<code>vnode</code>队列，调用原生<code>DOM</code>的<code>API</code>将<code>DOM</code>插入到父节点中（以上是<code>createElm</code>的函数逻辑）</li><li>由于是递归调用，所以整个<code>vnode</code>树节点的插入顺序是先子后父</li></ul></li></ol><h4 id="5-Virtual-DOM"><a href="#5-Virtual-DOM" class="headerlink" title="(5) Virtual DOM"></a>(5) <code>Virtual DOM</code></h4><ol><li><code>Virtual DOM</code>就是用一个原生的<code>js</code>对象去描述一个<code>DOM</code>节点，在<code>Vue</code>中是通过<code>VNode</code>这个<code>Class</code>去描述</li><li><code>VNode</code>只是用来映射到真实<code>DOM</code>的渲染，不包含操作<code>DOM</code>的方法。核心定义为关键属性、标签名、数据、子节点、键值等</li></ol>]]></content>
+    
+    
+    <categories>
+      
+      <category>Vue2.x源码学习</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>源码学习</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>父组件异步获取到的数据如何同步到子组件</title>
+    <link href="/2022/07/14/%E7%88%B6%E7%BB%84%E4%BB%B6%E5%BC%82%E6%AD%A5%E8%8E%B7%E5%8F%96%E5%88%B0%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A6%82%E4%BD%95%E5%90%8C%E6%AD%A5%E5%88%B0%E5%AD%90%E7%BB%84%E4%BB%B6/"/>
+    <url>/2022/07/14/%E7%88%B6%E7%BB%84%E4%BB%B6%E5%BC%82%E6%AD%A5%E8%8E%B7%E5%8F%96%E5%88%B0%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A6%82%E4%BD%95%E5%90%8C%E6%AD%A5%E5%88%B0%E5%AD%90%E7%BB%84%E4%BB%B6/</url>
+    
+    <content type="html"><![CDATA[<h4 id="1-父子组件生命周期执行顺序"><a href="#1-父子组件生命周期执行顺序" class="headerlink" title="(1) 父子组件生命周期执行顺序"></a>(1) 父子组件生命周期执行顺序</h4><ol><li><p>加载渲染数据过程</p><ul><li><code>beforeCreate</code></li><li>父组件 <code>created </code></li><li>父组件 <code>beforeMount </code></li><li>子组件 <code>beforeCreate</code></li><li>子组件 <code>created</code></li><li>子组件 <code>beforeMount</code></li><li>子组件 <code>mounted</code></li><li>父组件 <code>mounted</code></li></ul></li><li><p>更新渲染数据过程</p><ul><li>父组件 <code>beforeUpdate</code></li><li>子组件 <code>beforeUpdate </code></li><li>子组件<code> updated</code></li><li>父组件 <code>updated</code></li></ul></li><li><p>销毁组件数据过程</p><ul><li>父组件<code> beforeDestroy</code></li><li>子组件 <code>beforeDestroy</code></li><li>子组件 <code>destroyed</code></li><li>父组件 <code>destroyed</code></li></ul></li></ol><h4 id="2-问题"><a href="#2-问题" class="headerlink" title="(2)  问题"></a>(2)  问题</h4><p>​我们从<code>props</code>中拿到的数据一般需要经过一些处理再放到模板中去使用。如果直接使用<code>props</code>值进行双向绑定，会提示错误：</p><figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs applescript">Avoid mutating a <span class="hljs-keyword">prop</span> directly <span class="hljs-keyword">since</span> <span class="hljs-keyword">the</span> value will be overwritten whenever <span class="hljs-keyword">the</span> parent component re-renders. Instead, use a data <span class="hljs-keyword">or</span> computed <span class="hljs-keyword">property</span> based <span class="hljs-keyword">on</span> <span class="hljs-keyword">the</span> <span class="hljs-keyword">prop</span>&#x27;s value<br></code></pre></td></tr></table></figure><p>若在<code>mounted</code>钩子中对数据进行获取和处理，<code>mounted</code>钩子默认加载只会执行一次，若子组件<code>mounted</code>之后还未拿到父组件通过<code>props</code>传入的异步获取数据，则会出现数据无法同步的结果</p><h4 id="3-解决方式"><a href="#3-解决方式" class="headerlink" title="(3) 解决方式"></a>(3) 解决方式</h4><ol><li><p>用<code>v-if</code>来控制子组件的加载渲染时机。我们可以等到传递给子组件的数据有值之后，再加载子组件</p></li><li><p>在子组件中的<code>watch</code>属性中监听数据的变化</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-attr">props</span>: &#123;<br>    <span class="hljs-attr">newsHtml</span>: &#123;<br>      <span class="hljs-attr">type</span>: <span class="hljs-title class_">String</span>,<br>      <span class="hljs-attr">default</span>: <span class="hljs-string">&#x27;&lt;p&gt;请输入内容&lt;/p&gt;&#x27;</span><br>    &#125;<br>&#125;,<br><span class="hljs-attr">watch</span>: &#123;<br>    <span class="hljs-title function_">newsHtml</span>(<span class="hljs-params">newVal, oldVal</span>) &#123;<br>      <span class="hljs-variable language_">this</span>.<span class="hljs-property">html</span> = newVal<br>    &#125;<br>&#125;,<br></code></pre></td></tr></table></figure></li><li><p>使用<code>Vuex</code>进行状态管理。但这种父子组件传值的情况感觉没必要</p></li></ol>]]></content>
+    
+    
+    <categories>
+      
+      <category>Vue2.x踩坑填坑系列</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>踩坑系列</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>beforeCreate中访问methods中的函数</title>
+    <link href="/2022/07/14/beforeCreate%E4%B8%AD%E8%AE%BF%E9%97%AEmethods%E4%B8%AD%E7%9A%84%E5%87%BD%E6%95%B0/"/>
+    <url>/2022/07/14/beforeCreate%E4%B8%AD%E8%AE%BF%E9%97%AEmethods%E4%B8%AD%E7%9A%84%E5%87%BD%E6%95%B0/</url>
+    
+    <content type="html"><![CDATA[<p>​在<code>beforeCreate</code>中打印当前实例对象<code>this</code>时，看到已经包含了定义的<code>methods</code>,但是在<code>beforeCreate</code>中调用<code>methods</code>中的方法时报错。<img src="/2022/07/14/beforeCreate%E4%B8%AD%E8%AE%BF%E9%97%AEmethods%E4%B8%AD%E7%9A%84%E5%87%BD%E6%95%B0/image-20220705141100204.png" alt="image-20220705141100204"></p><p>​引用类型的值存在堆内存中，当我们使用<code>console.log</code>打印对象时，实际上它其实打印的时当前对象的快照。当展开对象时，浏览器重新去堆内存中读取当前最新的值。通过<code>debugger</code>打印，可以看到实际上在<code>beforeCreate</code>中是访问不到<code>methods</code>中的定义的方法的</p><p><img src="/2022/07/14/beforeCreate%E4%B8%AD%E8%AE%BF%E9%97%AEmethods%E4%B8%AD%E7%9A%84%E5%87%BD%E6%95%B0/image-20220705140930798.png" alt="image-20220705140930798"></p><p><img src="/2022/07/14/beforeCreate%E4%B8%AD%E8%AE%BF%E9%97%AEmethods%E4%B8%AD%E7%9A%84%E5%87%BD%E6%95%B0/image-20220705140909403.png" alt="image-20220705140909403"></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>Vue2.x踩坑填坑系列</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>踩坑系列</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Vue学习资源</title>
+    <link href="/2022/07/13/Vue%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90/"/>
+    <url>/2022/07/13/Vue%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90/</url>
+    
+    <content type="html"><![CDATA[<h3 id="一、Vue2-（可以按顺序看，1和2可以结合看）"><a href="#一、Vue2-（可以按顺序看，1和2可以结合看）" class="headerlink" title="一、Vue2 （可以按顺序看，1和2可以结合看）"></a>一、<code>Vue2</code> （可以按顺序看，1和2可以结合看）</h3><ol><li><a href="https://github.com/ustbhuangyi/vue-analysis">vue-analysis</a></li><li><a href="https://github.com/biaochenxuying/vue-family-mindmap">vue-family-mindmap</a></li><li><a href="https://github.com/HcySunYang/vue-design">vue-design</a></li></ol><h3 id="二、Vue3"><a href="#二、Vue3" class="headerlink" title="二、Vue3"></a>二、<code>Vue3</code></h3><ol><li><p>学习网址：</p><ul><li><a href="https://vue3js.cn/">Vue3js</a></li></ul></li><li><p>源码学习：</p><ul><li><a href="https://vue3js.cn/start/">vue3js-start</a></li></ul></li></ol><h3 id="三、Vue开源项目学习"><a href="#三、Vue开源项目学习" class="headerlink" title="三、Vue开源项目学习"></a>三、<code>Vue</code>开源项目学习</h3><ol><li>更新时间：5年前： <a href="https://github.com/opendigg/awesome-github-vue">Vue 相关开源项目库汇总</a></li></ol><h3 id="四、github找资源"><a href="#四、github找资源" class="headerlink" title="四、github找资源"></a>四、github找资源</h3><ol><li>内容在<code>issues</code>里：<a href="https://github.com/FrontEndGitHub/FrontEndGitHub/issues">GitHub最全的前端资源汇总仓库</a></li><li><a href="https://github.com/biaochenxuying/blog/issues/45">GitHub上如何发现优秀开源项目 </a></li></ol><h3 id="五、提高效率"><a href="#五、提高效率" class="headerlink" title="五、提高效率"></a>五、提高效率</h3><ol><li><a href="https://github.com/FrontEndGitHub/FrontEndGitHub/issues/9">前端必备在线工具</a></li></ol><h3 id="六、前端开发知识结构"><a href="#六、前端开发知识结构" class="headerlink" title="六、前端开发知识结构"></a>六、前端开发知识结构</h3><ol><li><a href="https://github.com/JacksonTian/fks">前端开始知识结构</a></li></ol><h3 id="七、前端面试"><a href="#七、前端面试" class="headerlink" title="七、前端面试"></a>七、前端面试</h3><ol><li><a href="https://juejin.cn/post/6895752757534261256#heading-1">前端面试项目汇总</a></li></ol>]]></content>
+    
+    
+    <categories>
+      
+      <category>学习资源</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>资源汇总</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Vue2.x源码学习思考与问题汇总-持续更新</title>
+    <link href="/2022/07/13/Vue2-x%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%80%9D%E8%80%83%E4%B8%8E%E9%97%AE%E9%A2%98%E6%B1%87%E6%80%BB-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0/"/>
+    <url>/2022/07/13/Vue2-x%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E6%80%9D%E8%80%83%E4%B8%8E%E9%97%AE%E9%A2%98%E6%B1%87%E6%80%BB-%E6%8C%81%E7%BB%AD%E6%9B%B4%E6%96%B0/</url>
+    
+    <content type="html"><![CDATA[<h3 id="一、为什么用function而不是ES6的class来实现Vue类？"><a href="#一、为什么用function而不是ES6的class来实现Vue类？" class="headerlink" title="一、为什么用function而不是ES6的class来实现Vue类？"></a>一、为什么用function而不是ES6的class来实现Vue类？</h3><p>​源码中<code>Vue</code>对象定义的部分</p><figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs actionscript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">Vue</span> <span class="hljs-params">(options)</span> &#123;<br>  <span class="hljs-keyword">if</span> (process.env.NODE_ENV !== <span class="hljs-string">&#x27;production&#x27;</span> &amp;&amp;<br>    !(<span class="hljs-keyword">this</span> <span class="hljs-keyword">instanceof</span> Vue)<br>  ) &#123;<br>    warn(<span class="hljs-string">&#x27;Vue is a constructor and should be called with the `new` keyword&#x27;</span>)<br>  &#125;<br>  <span class="hljs-keyword">this</span>._init(options)<br>&#125;<br></code></pre></td></tr></table></figure><p>既然<code>Vue</code>要规定只能通过<code>new</code>关键字调用，那为什么不直接使用<code>Class</code>呢？将上面代码换成</p><figure class="highlight wren"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs wren"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Vue</span> &#123;<br>  <span class="hljs-title function_">constructor</span>(<span class="hljs-params">options</span>) &#123;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-variable">_init</span>(<span class="hljs-variable">options</span>)<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure><p>依旧可以实现简单的响应式页面</p><h4 id="补充：Class与构造函数"><a href="#补充：Class与构造函数" class="headerlink" title="补充：Class与构造函数"></a>补充：<code>Class</code>与构造函数</h4><ol><li><p><code>class</code>实质上可以看作一个语法糖，写法</p><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Point</span></span>&#123;<br><span class="hljs-keyword">constructor</span>(x,y) &#123;<br><span class="hljs-keyword">this</span>.x = x;<br><span class="hljs-keyword">this</span>.y = y;<br>&#125;<br><br>toString() &#123;<br><span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.x + <span class="hljs-string">&#x27;;&#x27;</span> + <span class="hljs-keyword">this</span>.y<br>&#125;<br>&#125;<br></code></pre></td></tr></table></figure><p>采用构造函数方式实现时：</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">Point</span>(<span class="hljs-params">x,y</span>) &#123;<br><span class="hljs-variable language_">this</span>.<span class="hljs-property">x</span> = x;<br><span class="hljs-variable language_">this</span>.<span class="hljs-property">y</span> = y;<br>&#125;<br><br><span class="hljs-title class_">Point</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">toString</span> = <span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) &#123;<br><span class="hljs-keyword">return</span> <span class="hljs-variable language_">this</span>.<span class="hljs-property">x</span> + <span class="hljs-string">&#x27;;&#x27;</span> + <span class="hljs-variable language_">this</span>.<span class="hljs-property">y</span><br>&#125;<br></code></pre></td></tr></table></figure></li><li><p>实际上，类的数据类型就是函数，类本身就是指向构造函数。</p><figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs arcade"><span class="hljs-built_in">console</span>.<span class="hljs-built_in">log</span>(<span class="hljs-built_in">typeof</span> <span class="hljs-built_in">Point</span>)    <span class="hljs-comment">// function</span><br><span class="hljs-built_in">console</span>.<span class="hljs-built_in">log</span>(<span class="hljs-built_in">Point</span> === <span class="hljs-built_in">Point</span>.prototype.constructor)  <span class="hljs-comment">// true</span><br></code></pre></td></tr></table></figure></li><li><p>与使用构造函数一样，实例属性除非显示定义在其本身(即<code>this</code>对象)上，否则都是定义在其原型上</p></li><li><h4 id="与构造函数实现的不同在于"><a href="#与构造函数实现的不同在于" class="headerlink" title="与构造函数实现的不同在于"></a><strong>与构造函数实现的不同在于</strong></h4><ul><li><strong>类必须要使用<code>new</code>来调用</strong>，而普通构造函数不使用<code>new</code>也可以执行</li><li>类的所有方法都定义在<code>prototype</code>对象上，且均不可枚举。而构造函数用法下，其原型上定义的方法均可枚举(除了<code>constructor</code>)</li><li>类不存在变量提升，必须定义在前，使用在后</li></ul></li></ol>]]></content>
+    
+    
+    <categories>
+      
+      <category>Vue2.x源码学习</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>源码学习</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Vue3.x源码初探</title>
+    <link href="/2022/07/13/Vue3%E5%88%9D%E6%8E%A2/"/>
+    <url>/2022/07/13/Vue3%E5%88%9D%E6%8E%A2/</url>
+    
+    <content type="html"><![CDATA[<ol><li><h4 id="源码学习–调试环境搭建"><a href="#源码学习–调试环境搭建" class="headerlink" title="源码学习–调试环境搭建"></a>源码学习–调试环境搭建</h4><ul><li><p><code>Vue3</code>源码：记得是在<code>vuejs/core</code>目录下，<code>git clone https://github.com/vuejs/core.git</code></p></li><li><p>安装依赖： <code>yarn --ignore-scripts</code>，用<code>npm</code>会报错，会显示无法安装<code>&quot;workspace:*&quot;,</code></p></li><li><p>生成<code>sourcemap</code>文件，在<code>package.json</code>文件中</p><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-attr">&quot;dev&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;node scripts/dev.js --sourcemap&quot;</span><br></code></pre></td></tr></table></figure></li><li><p>编译： <code>yarn dev</code></p><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs stylus"><span class="hljs-comment">// 生成结果</span><br>packages\vue\dist\vue<span class="hljs-selector-class">.global</span><span class="hljs-selector-class">.js</span><br>packages\vue\dist\vue<span class="hljs-selector-class">.global</span><span class="hljs-selector-class">.js</span>.map<br></code></pre></td></tr></table></figure></li><li><p>调试范例代码：<code>yarn serve</code></p><p>![image-20220617103035576](..&#x2F;..&#x2F;..&#x2F;studyNote&#x2F;Vue&#x2F;1. Vue3初探+响应式原理.assets&#x2F;image-20220617103035576.png)</p></li></ul></li><li><h3 id="Vue3-依赖收集实现"><a href="#Vue3-依赖收集实现" class="headerlink" title="Vue3-依赖收集实现"></a><code>Vue3</code>-依赖收集实现</h3><ol><li><p>依赖收集</p><ul><li>建立响应数据<code>key</code>和更新函数之间的对应关系</li></ul></li><li><p>用法</p><figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs pf">// 设置响应函数<br>effct(() =&gt; &#123;console.<span class="hljs-keyword">log</span>(<span class="hljs-keyword">state</span>.foo)&#125;)<br><br>// 用户修改关联数据会触发响应函数<br><span class="hljs-keyword">state</span>.foo =&#x27;xxx&#x27;<br></code></pre></td></tr></table></figure></li><li><p>主要思路</p><ul><li><p>流程图</p><p>![image-20220619211915810](..&#x2F;..&#x2F;..&#x2F;studyNote&#x2F;Vue&#x2F;3-1. Vue3初探+响应式原理.assets&#x2F;image-20220619211915810.png)</p></li><li><p>主要函数</p><ul><li><code>effect</code>: 将回调函数(<code>effct(cb)</code>)保存起来备用(放入<code>effctTrack</code>)，并<strong>立即执行一次回调函数</strong>触发它里面一些响应数据的<code>getter</code></li><li><code>track</code>：<code>getter</code>中调用<code>track</code>，把前面存储的回调函数和当前的<code>target</code>、<code>key</code>之间建立映射关系<ul><li><code>track</code>函数逻辑：获取<code>effct</code>存入的函数(即<code>effctTrack</code>栈顶)；在<code>targetMap</code>中获取<code>target</code>对应的<code>Map</code>，若不存在则新建<code>map</code>；通过<code>key</code>获取到<code>map</code>中对应的<code>set</code>，若不存在则新建<code>set</code>；将传入<code>effct</code>的回调函数添加到<code>set</code>结构中</li></ul></li><li><code>trigger</code>：<code>setter</code>中调用<code>trigger</code>，把<code>target</code>、<code>key</code>对应的响应函数都执行一遍 <ul><li><code>trigger</code>函数逻辑：在<code>targetMap</code>中获取<code>target</code>对应的<code>Map</code>，若存在则获取<code>key</code>对应的<code>set</code>(回调函数集合)；遍历执行<code>set</code>中的函数</li></ul></li></ul></li></ul></li></ol></li></ol>]]></content>
+    
+    
+    <categories>
+      
+      <category>Vue3.x源码学习</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>源码学习</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Vue2.x源码学习准备</title>
+    <link href="/2022/07/13/%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E5%87%86%E5%A4%87/"/>
+    <url>/2022/07/13/%E6%BA%90%E7%A0%81%E5%AD%A6%E4%B9%A0%E5%87%86%E5%A4%87/</url>
+    
+    <content type="html"><![CDATA[<h4 id="1-源码学习–调试环境搭建"><a href="#1-源码学习–调试环境搭建" class="headerlink" title="(1) 源码学习–调试环境搭建"></a>(1) 源码学习–调试环境搭建</h4><ul><li><p><code>Vue2</code>源码地址：<code>https://github.com/vuejs/vue.git</code></p><ul><li><code>windows</code>上一直报错，最后我直接下载<code>2.6.11</code>版本压缩包，按照下列操作运行没有问题<code>https://github.com/vuejs/vue/tree/v2.6.11</code></li></ul></li><li><p>安装依赖：<code>yarn</code>, 使用<code>npm</code>会因为无法安装一些依赖而报错</p></li><li><p>安装<code>rollup</code>：<code>yarn add rollup -g</code></p><ul><li><p>修改<code>dev</code>脚本，添加<code>sourcemap</code>，<code>package.json</code></p><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs json"><span class="hljs-attr">&quot;dev&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;rollup -w -c scripts/config.js --sourcemap --environment TARGET:web-full-dev&quot;</span><br></code></pre></td></tr></table></figure></li></ul></li><li><p>运行开发命令：<code>yarn dev</code></p></li><li><p>我采用的<code>yarn</code>安装步骤：</p><ul><li><p>(前提是已经安装好<code>nodejs</code>)下载<a href="https://classic.yarnpkg.com/latest.msi">yarn</a></p></li><li><p>配置下载目录</p><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs routeros"><span class="hljs-comment"># 全局安装目录</span><br>yarn<span class="hljs-built_in"> config </span><span class="hljs-built_in">set</span> global-folder D:\Yarn\yarn_global<br><br><span class="hljs-comment"># 缓存目录</span><br>yarn<span class="hljs-built_in"> config </span><span class="hljs-built_in">set</span> cache-folder D:\Yarn\yarn_cache<br></code></pre></td></tr></table></figure></li></ul></li></ul><h4 id="2-源码学习-准备工作"><a href="#2-源码学习-准备工作" class="headerlink" title="(2) 源码学习-准备工作"></a>(2) 源码学习-准备工作</h4><ol><li><p><code>Flow</code></p></li><li><p>源码目录<code>src</code>设计</p></li><li><p>源码构建方式</p><ul><li><p><code>RuntimeOnly</code></p><ul><li>在使用<code>RuntimeOnly</code>版本的<code>Vue.js</code>时，通常需要借助<code>webpack</code>的<code>vue-loader</code>工具将<code>.vue</code>文件编译为<code>javascript</code>对象，因为是在编译阶段做的，所以它只包含运行时的<code>Vue.js</code>代码，因此体积也会更加轻量</li></ul></li><li><p><code>Runtime + Compiler</code></p><ul><li><p>若我们没有对代码做预编译，但又使用了<code>Vue</code>的<code>template</code>属性传入一个字符串，则需要在客户端编译模板。因为在<code>Vue2</code>中，最终渲染都是通过<code>render</code>函数，若写了<code>template</code>属性吗，则需要编译成<code>render</code>函数，那么这个编译过程会发生在运行时，所以需要带有编译器的版本</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">//  需要编译器的版本</span><br><span class="hljs-keyword">new</span> <span class="hljs-title class_">Vue</span>(&#123;<br><span class="hljs-attr">template</span>:<span class="hljs-string">&#x27;&lt;div&gt;&#123;&#123;hi&#125;&#125;&lt;/div&gt;&#x27;</span><br>&#125;)<br><br><span class="hljs-comment">// 不需要编译器的版本</span><br><span class="hljs-keyword">new</span> <span class="hljs-title class_">Vue</span>(&#123;<br><span class="hljs-title function_">render</span>(<span class="hljs-params">h</span>) &#123;<br><span class="hljs-keyword">return</span> <span class="hljs-title function_">h</span>(<span class="hljs-string">&#x27;div&#x27;</span>, <span class="hljs-variable language_">this</span>.<span class="hljs-property">hi</span>)<br>&#125;<br>&#125;)<br></code></pre></td></tr></table></figure></li></ul></li></ul></li></ol>]]></content>
+    
+    
+    <categories>
+      
+      <category>Vue2.x源码学习</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>源码学习</tag>
+      
+    </tags>
     
   </entry>
   
