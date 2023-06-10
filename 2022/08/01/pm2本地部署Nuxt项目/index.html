@@ -1,0 +1,669 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" href="/img/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#AFEEEE">
+  <meta name="author" content="Echo">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="安装pm21npm install pm2@latest -g  运行下列指令（不用cd到项目目录下）1pm2 start npm --name marketing_h5  -- run start  发现项目状态为stopped  查看报错日志  一些博客提到，是由于node无法操作cmd造成的，给出解决方案： 1234567891、npm install node-cmd --save;2、">
+<meta property="og:type" content="article">
+<meta property="og:title" content="pm2本地部署Nuxt项目">
+<meta property="og:url" content="https://echo-makegreateffort.github.io/2022/08/01/pm2%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2Nuxt%E9%A1%B9%E7%9B%AE/index.html">
+<meta property="og:site_name" content="Echo的博客">
+<meta property="og:description" content="安装pm21npm install pm2@latest -g  运行下列指令（不用cd到项目目录下）1pm2 start npm --name marketing_h5  -- run start  发现项目状态为stopped  查看报错日志  一些博客提到，是由于node无法操作cmd造成的，给出解决方案： 1234567891、npm install node-cmd --save;2、">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://echo-makegreateffort.github.io/2022/08/01/pm2%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2Nuxt%E9%A1%B9%E7%9B%AE/image-20220830152831128.png">
+<meta property="og:image" content="https://echo-makegreateffort.github.io/2022/08/01/pm2%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2Nuxt%E9%A1%B9%E7%9B%AE/image-20220830152907692.png">
+<meta property="og:image" content="https://echo-makegreateffort.github.io/2022/08/01/pm2%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2Nuxt%E9%A1%B9%E7%9B%AE/image-20220830152940864.png">
+<meta property="article:published_time" content="2022-08-01T11:37:02.000Z">
+<meta property="article:modified_time" content="2023-06-05T02:48:47.549Z">
+<meta property="article:author" content="Echo">
+<meta property="article:tag" content="node">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://echo-makegreateffort.github.io/2022/08/01/pm2%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2Nuxt%E9%A1%B9%E7%9B%AE/image-20220830152831128.png">
+  
+  
+  
+  <title>pm2本地部署Nuxt项目 - Echo的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"echo-makegreateffort.github.io","root":"/","version":"1.9.2","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Fluid</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/hexo-bg.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="pm2本地部署Nuxt项目"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-08-01 19:37" pubdate>
+          2022年8月1日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          14 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">pm2本地部署Nuxt项目</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <ol>
+<li><h4 id="安装pm2"><a href="#安装pm2" class="headerlink" title="安装pm2"></a>安装<code>pm2</code></h4><figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs coffeescript"><span class="hljs-built_in">npm</span> install pm2@latest -g<br></code></pre></td></tr></table></figure>
+</li>
+<li><h4 id="运行下列指令（不用cd到项目目录下）"><a href="#运行下列指令（不用cd到项目目录下）" class="headerlink" title="运行下列指令（不用cd到项目目录下）"></a>运行下列指令（不用<code>cd</code>到项目目录下）</h4><figure class="highlight brainfuck"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs brainfuck"><span class="hljs-comment">pm2 start npm</span> <span class="hljs-literal">--</span><span class="hljs-comment">name marketing_h5</span>  <span class="hljs-literal">--</span> <span class="hljs-comment">run start</span><br></code></pre></td></tr></table></figure>
+
+<p>发现项目状态为<code>stopped</code></p>
+<p><img src="/2022/08/01/pm2%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2Nuxt%E9%A1%B9%E7%9B%AE/image-20220830152831128.png" srcset="/img/loading.gif" lazyload alt="image-20220830152831128"></p>
+<p>查看报错日志</p>
+<p><img src="/2022/08/01/pm2%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2Nuxt%E9%A1%B9%E7%9B%AE/image-20220830152907692.png" srcset="/img/loading.gif" lazyload alt="image-20220830152907692"></p>
+<p>一些博客提到，是由于<code>node</code>无法操作<code>cmd</code>造成的，给出解决方案：</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs crmsh"><span class="hljs-number">1</span>、<br>npm install <span class="hljs-keyword">node</span><span class="hljs-title">-cmd</span> --save;<br><span class="hljs-number">2</span>、<br>新建startscript.js<br>const <span class="hljs-attr">cmd=</span>require(&#x27;<span class="hljs-keyword">node</span><span class="hljs-title">-cmd</span>&#x27;); <br>cmd.run(&#x27;npm <span class="hljs-literal">start</span>&#x27;);<br><span class="hljs-number">3</span>、<br>启动该脚本<br>pm2 <span class="hljs-literal">start</span> startscript.js<br></code></pre></td></tr></table></figure>
+
+<p>方案验证有效。通过命令行执行的缺点在于，配置都要在命令行加上，比如<code>--name marketing_h5</code>就是配置了<code>name</code>属性。在<code>Nuxt.js</code>官网找到了<code>pm2</code>启动<code>Nuxt</code>项目的流程</p>
+</li>
+<li><h4 id="NuxtJS-pm2"><a href="#NuxtJS-pm2" class="headerlink" title="NuxtJS-pm2"></a><a target="_blank" rel="noopener" href="https://nuxtjs.org/deployments/pm2/"><code>NuxtJS-pm2</code></a></h4><ul>
+<li><h5 id="配置文件在项目根目录新建ecosystem-config-js，添加下列配置"><a href="#配置文件在项目根目录新建ecosystem-config-js，添加下列配置" class="headerlink" title="配置文件在项目根目录新建ecosystem.config.js，添加下列配置"></a>配置文件在项目根目录新建<code>ecosystem.config.js</code>，添加下列配置</h5><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs awk">module.exports = &#123;<br>  apps: [<br>    &#123;<br>      name: <span class="hljs-string">&#x27;NuxtAppName&#x27;</span>,  <span class="hljs-regexp">//</span> 应用程序名称<br>      exec_mode: <span class="hljs-string">&#x27;cluster&#x27;</span>,<br>      instances: <span class="hljs-string">&#x27;max&#x27;</span>, <span class="hljs-regexp">//</span> Or a number of instances  启动实例数量，可以配置为<span class="hljs-number">1</span><br>      script: <span class="hljs-string">&#x27;./node_modules/nuxt/bin/nuxt.js&#x27;</span>,   <span class="hljs-regexp">//</span>pm2 start 执行的脚本相对路径<br>      args: <span class="hljs-string">&#x27;start&#x27;</span>   <span class="hljs-regexp">//</span> 传递给脚本的参数<br>    &#125;<br>  ]<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li>配置可参考<ul>
+<li>中文： <a target="_blank" rel="noopener" href="https://blog.csdn.net/zz00008888/article/details/113738025"><code>ecosystem.config.js字段详细介绍</code></a></li>
+<li>英文：<a target="_blank" rel="noopener" href="https://pm2.keymetrics.io/docs/usage/application-declaration/#general"><code>Attributes available</code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><h5 id="依次执行："><a href="#依次执行：" class="headerlink" title="依次执行："></a>依次执行：</h5><ul>
+<li><p><code>npm run build</code></p>
+</li>
+<li><p><code>pm2 start</code>：实际上是会去找配置文件。如果所在目录没有配置文件</p>
+<p><img src="/2022/08/01/pm2%E6%9C%AC%E5%9C%B0%E9%83%A8%E7%BD%B2Nuxt%E9%A1%B9%E7%9B%AE/image-20220830152940864.png" srcset="/img/loading.gif" lazyload alt="image-20220830152940864"></p>
+</li>
+<li><p><code>pm2 ls</code></p>
+</li>
+</ul>
+</li>
+<li><h5 id="配置log时间显示"><a href="#配置log时间显示" class="headerlink" title="配置log时间显示"></a>配置<code>log</code>时间显示</h5><ul>
+<li><p>在博客中看到配置<code>time: true</code>后日志有时间显示，本地验证设置<code>time:true</code>或执行<code>pm2 start npm --name marketing_h5 --time -- run star</code>后日志可以显示时间，但官方文档中未找到，按照官方文档给的字段</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs awk">module.exports = &#123;<br>    apps: [<br>      &#123;<br>        name: <span class="hljs-string">&#x27;marketing_h5&#x27;</span>,<br>        exec_mode: <span class="hljs-string">&#x27;cluster&#x27;</span>,<br>        instances: <span class="hljs-string">&#x27;1&#x27;</span>, <span class="hljs-regexp">//</span> Or a number of instances<br>        script: <span class="hljs-string">&#x27;./node_modules/nuxt/bin/nuxt.js&#x27;</span>,<br>        args: <span class="hljs-string">&#x27;start&#x27;</span>,<br>        log_date_format: <span class="hljs-string">&quot;YYYY-MM-DD HH:mm:ss&quot;</span>,   <span class="hljs-regexp">//</span> 配置日志日期格式<br>      &#125; <br>    ]<br>  &#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><h4 id="修改pm2启动端口"><a href="#修改pm2启动端口" class="headerlink" title="修改pm2启动端口"></a>修改<code>pm2</code>启动端口</h4><ul>
+<li><p>我们一般会在<code>package.json</code>中配置<code>nuxt</code>项目启动端口</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs autohotkey">// 与`script`同级<br><span class="hljs-string">&quot;config&quot;</span>: &#123;<br>    <span class="hljs-string">&quot;nuxt&quot;</span>: &#123;<br>      <span class="hljs-string">&quot;host&quot;</span>: <span class="hljs-string">&quot;0.0.0.0&quot;</span>,<br>      <span class="hljs-string">&quot;port&quot;</span>: <span class="hljs-string">&quot;3008&quot;</span><br>    &#125;<br> &#125;<br></code></pre></td></tr></table></figure>
+
+<p>但是通过<code>pm2</code>启动的时候端口号依旧是<code>3000</code>，经过各种方案尝试，最终通过以下方案实现：</p>
+<p>在<code>nuxt.config.js</code>中，与<code>head</code>同级添加以下配置</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs yaml"><span class="hljs-attr">server:</span> &#123;<br>    <span class="hljs-attr">port:</span> <span class="hljs-number">3008</span>,<br>    <span class="hljs-attr">host:</span> <span class="hljs-string">&#x27;0.0.0.0&#x27;</span>,<br> &#125;<span class="hljs-string">,</span><br></code></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ol>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%A7%AF%E8%B7%AC%E6%AD%A5%E4%BB%A5%E8%87%B4%E5%8D%83%E9%87%8C/" class="category-chain-item">积跬步以致千里</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/node/">#node</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>pm2本地部署Nuxt项目</div>
+      <div>https://echo-makegreateffort.github.io/2022/08/01/pm2本地部署Nuxt项目/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Echo</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年8月1日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/09/29/textContent%E5%8E%9F%E6%9D%A5%E5%92%8CinnerText%E4%B8%8D%E5%90%8C?/" title="textContent原来和innerText不同?">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">textContent原来和innerText不同?</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/07/19/%E7%90%86%E8%A7%A3Vue%E6%8F%92%E6%A7%BD%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86%E7%82%B9/" title="理解Vue插槽相关知识点">
+                        <span class="hidden-mobile">理解Vue插槽相关知识点</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
